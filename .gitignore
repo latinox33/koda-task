@@ -174,3 +174,6 @@ server/dist
 
 # Finder (MacOS) folder config
 .DS_Store
+
+# Husky
+.husky/_

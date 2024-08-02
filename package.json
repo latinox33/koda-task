@@ -18,10 +18,17 @@
     "lint:fix:client": "cd client && bun run lint:fix",
     "format": "bun run format:server && bun run format:client",
     "format:server": "cd server && bun run format",
-    "format:client": "cd client && bun run format"
+    "format:client": "cd client && bun run format",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "!(**/node_modules)/**/*.{js,vue,html,css,ts}": "bun run format",
+    "!(**/node_modules)/**/*.{js,vue,ts}": "bun run lint:fix"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "husky": "^9.1.4",
+    "lint-staged": "^15.2.7"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
