@@ -22,12 +22,17 @@ a:hover {
     color: #535bf2;
 }
 
+input {
+    font-size: 24px;
+}
+
 body {
     margin: 0;
     display: flex;
     place-items: center;
     min-width: 320px;
     min-height: 100vh;
+    background: radial-gradient(circle at 110% -10%, #f16fe6, #d484ec, #98a7f7, #66befe);
 }
 
 h1 {
@@ -52,17 +57,6 @@ button:hover {
 button:focus,
 button:focus-visible {
     outline: 4px auto -webkit-focus-ring-color;
-}
-
-.card {
-    padding: 2em;
-}
-
-#app {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 2rem;
-    text-align: center;
 }
 
 @media (prefers-color-scheme: light) {
