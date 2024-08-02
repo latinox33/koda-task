@@ -14,7 +14,7 @@ const compat = new FlatCompat({
 export default [
     ...compat.extends('eslint:recommended', 'plugin:vue/vue3-recommended', '@vue/eslint-config-typescript'),
     {
-        ignores: ["node_modules/", "dist/", "build/"],
+        ignores: ['node_modules/', 'dist/', 'build/'],
 
         languageOptions: {
             ecmaVersion: 2020,
