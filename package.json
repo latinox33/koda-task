@@ -1,0 +1,29 @@
+{
+  "name": "koda-task-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"bun run dev:server\" \"bun run dev:client\"",
+    "dev:server": "cd server && bun run dev",
+    "dev:client": "cd client && bun run dev",
+    "build": "bun run build:server && bun run build:client",
+    "build:server": "cd server && bun run build",
+    "build:client": "cd client && bun run build",
+    "start": "cd server && bun run start",
+    "lint": "bun run lint:server && bun run lint:client",
+    "lint:server": "cd server && bun run lint",
+    "lint:client": "cd client && bun run lint",
+    "lint:fix": "bun run lint:fix:server && bun run lint:fix:client",
+    "lint:fix:server": "cd server && bun run lint:fix",
+    "lint:fix:client": "cd client && bun run lint:fix",
+    "format": "bun run format:server && bun run format:client",
+    "format:server": "cd server && bun run format",
+    "format:client": "cd client && bun run format"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
