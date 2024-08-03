@@ -20,33 +20,41 @@
 <script setup lang="ts">
 import { onUnmounted, ref } from 'vue';
 import ChatBoxMessages from './ChatBoxMessages.vue';
-import { useFetch } from '@vueuse/core';
-import { IMessage } from '../interfaces/messages.interface.ts';
+// import { useFetch } from '@vueuse/core';
+import { IBubbleMessageProperties, IMessage } from '../interfaces/messages.interface.ts';
 
-const url = ref<string>('http://localhost:3000/api/flights/get-flights');
+// const url = ref<string>('http://localhost:3000/api/flights/get-flights');
 
 const promptText = ref<string>('');
-const messages = ref<IMessage[]>([]);
+const messages = ref<IBubbleMessageProperties[]>([]);
 let intervalId: ReturnType<typeof setTimeout>;
 
 const sendMessage = async (): Promise<void> => {
     if (!promptText.value) return;
 
-    const dateModelsForYou = prepareDateModel();
     messages.value.push({
         author: 'user',
         message: promptText.value,
-        ...dateModelsForYou,
+        ...prepareDateModel(),
+        position: 'right',
+        avatar: {
+            class: 'bg-y-text-b',
+            text: 'You',
+        },
     });
     promptText.value = '';
 
     if (intervalId) clearInterval(intervalId);
     intervalId = setTimeout(() => {
-        const dateModelForAi = prepareDateModel();
         messages.value.push({
             author: 'ai',
             message: 'cos tam cos tam',
-            ...dateModelForAi,
+            ...prepareDateModel(),
+            position: 'left',
+            avatar: {
+                class: 'bg-b-text-w',
+                text: 'AI',
+            },
         });
     }, 500);
 

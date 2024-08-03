@@ -32,7 +32,7 @@ body {
     place-items: center;
     min-width: 320px;
     min-height: 100vh;
-    background: radial-gradient(circle at 110% -10%, #f16fe6, #d484ec, #98a7f7, #66befe);
+    background: radial-gradient(circle at 110% 110%, #f16fe6, #d484ec, #98a7f7, #66befe);
 }
 
 h1 {
