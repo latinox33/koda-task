@@ -1,6 +1,12 @@
 import dotenv from 'dotenv';
-import { initializeWebServer } from '../instances/web-server.instance';
+import { initializeWebServer } from './instances/web-server.instance';
+import path from 'path';
+import { initModules } from './modules';
 
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-initializeWebServer();
+const { app, startServer } = initializeWebServer();
+
+app.use('/api', initModules());
+
+startServer();
