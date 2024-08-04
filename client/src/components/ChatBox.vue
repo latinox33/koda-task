@@ -1,6 +1,6 @@
 <template>
   <div class="chat-box-container w-[80%] h-[80%] flex flex-col justify-between items-stretch p-4">
-    <h2 class="text-[#011638] b-b-[#011638] b-b-solid pb-2">
+    <h2 class="text-[#011638] b-b-[#011638] b-b-solid pb-2 mt-0">
       Chat box
     </h2>
     <ChatBoxMessages :messages="messages" />
@@ -20,10 +20,10 @@
 <script setup lang="ts">
 import { onUnmounted, ref } from 'vue';
 import ChatBoxMessages from './ChatBoxMessages.vue';
-// import { useFetch } from '@vueuse/core';
+import { useFetch } from '@vueuse/core';
 import { IBubbleMessageProperties, IMessage } from '../interfaces/messages.interface.ts';
 
-// const url = ref<string>('http://localhost:3000/api/flights/get-flights');
+const url = ref<string>('http://localhost:3000/api/flights/get-flights');
 
 const promptText = ref<string>('');
 const messages = ref<IBubbleMessageProperties[]>([]);
@@ -42,13 +42,14 @@ const sendMessage = async (): Promise<void> => {
             text: 'You',
         },
     });
+    const _promptText = promptText.value;
     promptText.value = '';
 
     if (intervalId) clearInterval(intervalId);
     intervalId = setTimeout(() => {
         messages.value.push({
             author: 'ai',
-            message: 'cos tam cos tam',
+            message: '...',
             ...prepareDateModel(),
             position: 'left',
             avatar: {
@@ -58,10 +59,8 @@ const sendMessage = async (): Promise<void> => {
         });
     }, 500);
 
-    // const { data: responseData } = await useFetch(url)
-    //     .post({ promptText: promptText.value })
-    //     .json();
-    // console.log(responseData.value);
+    const { data: responseData } = await useFetch(url).post({ promptText: _promptText }).json();
+    updateMessage(responseData.value);
 };
 
 const prepareDateModel = (): Pick<IMessage, 'date' | 'datePlaceholder' | 'hour'> => {
@@ -76,6 +75,19 @@ const prepareDateModel = (): Pick<IMessage, 'date' | 'datePlaceholder' | 'hour'>
 onUnmounted(() => {
     if (intervalId) clearInterval(intervalId);
 });
+
+const updateMessage = (props: { status: string; message: string }) => {
+    if (intervalId) clearInterval(intervalId);
+    intervalId = setTimeout(() => {
+        const key = messages.value.length - 1;
+
+        messages.value[key] = {
+            ...messages.value[key],
+            message: props.message,
+            ...prepareDateModel(),
+        };
+    }, 1500);
+};
 </script>
 
 <style scoped>

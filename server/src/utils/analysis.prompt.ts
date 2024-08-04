@@ -22,7 +22,7 @@ export function getFlightsAnalysisPrompt(userPrompt: string) {
             "suggestion": string | null
         }
     
-        isValidQuery - powinno wskazywać czy udało się zinterpretować zapytanie o loy z Wrocławia
+        isValidQuery - powinno wskazywać czy udało się zinterpretować zapytanie o loty z Wrocławia
         destination - powinno wskazywać kod lotniska wylotu lub lokalizację kgmid (na przykład zamiast 
             Poznań powinno być POZ, Kraków-Balice jako KRK)
         dateModel - obiekt z kilkoma parametrami. Parametr date powinien być datą, którą wyświetlę użytkownikowi więc 
@@ -43,7 +43,9 @@ export function getFlightsSummaryPrompt(
         ${JSON.stringify(flights)}
         
         Wyniki są podzielone na dwie tablice: bestFlights oraz otherFlights. Może się zdarzyć, że bestFlights 
-        będzie pustą tablicą, ale w takiej sytuacji zaproponujesz inne rozwiązania na podstawie otherFlights
+        będzie pustą tablicą, ale w takiej sytuacji zaproponujesz inne rozwiązania na podstawie otherFlights. 
+        Jeżeli w tablicy otherFlights w polu flights jest wiele elementów to oznacza, że lot ma przesiadki.
+        Uwzględnij to w podsumowaniu. 
         
         Utwórz krótkie, przyjazne dla użytkownika podsumowanie zawierające:
         1. Liczbę znalezionych lotów
@@ -51,6 +53,8 @@ export function getFlightsSummaryPrompt(
         3. Najkrótszy i najdłuższy czas lotu
         4. Sugestię najlepszej opcji (np. najtańszy lub najkrótszy lot)
 
-        Odpowiedź sformatuj w przyjazny dla użytkownika sposób.
+        Odpowiedź sformatuj w przyjazny dla użytkownika sposób i w języku polskim. Musisz się zmieścić w 300 słowach.
+        W odpowiedzi nie wspominaj nic o danych wejściowych, które otrzymałeś. Jedynie wyciągnij z nich informacje i 
+        uwzględnij w podsumowaniu. Nie wspominaj również nic o "bestFlights" i "otherFlights".
     `;
 }

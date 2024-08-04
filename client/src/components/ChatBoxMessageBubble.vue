@@ -11,16 +11,16 @@
     </div>
 
     <div
-      class="flex flex-col w-full max-w-[320px] leading-1.5 py-1 px-2 border-gray-200 bg-gray-100 dark:bg-gray-700"
+      class="flex flex-col w-full max-w-[320px] leading-1.5 py-1 px-2 border-gray-200 bg-gray-100"
       :class="bubbleContainerClass"
     >
       <div class="flex items-center space-x-2 rtl:space-x-reverse">
-        <span class="text-sm font-semibold text-gray-900 dark:text-gray-400">
-          <strong class="text-[#afabab] text-xs">{{ properties.datePlaceholder }}</strong>
+        <span class="text-sm font-semibold text-gray-900">
+          <strong class="text-[#8b8b8b] text-xs">{{ properties.datePlaceholder }}</strong>
           {{ properties.hour }}
         </span>
       </div>
-      <p class="text-sm font-normal m-0 py-1 text-gray-900 dark:text-white">
+      <p class="text-sm font-normal m-0 py-1 text-gray-900">
         {{ properties.message }}
       </p>
     </div>

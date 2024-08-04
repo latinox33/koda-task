@@ -1,8 +1,11 @@
 import type { Request, Response } from 'express';
-import { llmService } from '../../../services/LLM.service.ts';
-import { getFlightsAnalysisPrompt, getFlightsSummaryPrompt } from '../../../utils/analysis.prompt.ts';
+// import { getFlightsAnalysisPrompt } from '../../../utils/analysis.prompt.ts';
+import { getFlightsSummaryPrompt } from '../../../utils/analysis.prompt.ts';
 import { IFlight, IFlightInfo, IFlightSummary } from '../../../interfaces/flights.interface.ts';
-import { flightService } from '../../../services/flights.service.ts';
+import { ELLMServiceType, initLLMService } from '../../../services/LLM.service.factory.ts';
+import { IHuggingFaceLLMService } from '../../../classes/huggingFaceLLM.service.class.ts';
+import { EFlightsServiceType, initFlightsService } from '../../../services/flights.service.factory.ts';
+import { IFlightsSerpApiService } from '../../../classes/flights-serp-api.service.class.ts';
 
 export const getFlightsAction = async (req: Request, res: Response) => {
     const { promptText } = req.body;
@@ -10,10 +13,24 @@ export const getFlightsAction = async (req: Request, res: Response) => {
         return res.sendStatus(400);
     }
 
+    const llmService = initLLMService<IHuggingFaceLLMService>(ELLMServiceType.HuggingFace);
+    const flightsService = initFlightsService<IFlightsSerpApiService>(EFlightsServiceType.SerpApi);
+
     let parsedResult: IFlight;
     try {
-        const analysisResult = await llmService.generateResponse(getFlightsAnalysisPrompt(promptText));
-        parsedResult = JSON.parse(analysisResult) as IFlight;
+        // const analysisResult = await llmService.generateResponse(getFlightsAnalysisPrompt(promptText));
+        parsedResult = {
+            isValidQuery: true,
+            destination: 'POZ',
+            dateModel: {
+                date: '21.08.2024',
+                fullDate: '2024-08-21',
+                returnFullDate: '2024-08-28',
+            },
+            missingInfo: [],
+            suggestion: null,
+        };
+        // parsedResult = JSON.parse(analysisResult) as IFlight;
     } catch (e) {
         console.error('Parse error', e);
         return res.json({ status: 'Error', message: 'Error :(' });
@@ -39,12 +56,12 @@ export const getFlightsAction = async (req: Request, res: Response) => {
 
     let flights: { bestFlights: IFlightSummary[][]; otherFlights: IFlightSummary[][] };
     try {
-        flights = await flightService.searchFlights(
-            'WRO',
-            flightInfo.destination,
-            flightInfo.date,
-            flightInfo.returnDate,
-        );
+        flights = await flightsService.searchFlights({
+            from: 'WRO',
+            to: flightInfo.destination,
+            date: flightInfo.date,
+            returnDate: flightInfo.returnDate,
+        });
     } catch (e) {
         console.error('Flights error', e);
         return res.json({ status: 'Error', message: 'Error flights :(' });
@@ -68,6 +85,6 @@ export const getFlightsAction = async (req: Request, res: Response) => {
     return res.json({ status: 'OK', message: summaryMessage });
 };
 
-export const checkHealth = async (req: Request, res: Response) => {
+export const checkHealth = async (_req: Request, res: Response) => {
     return res.sendStatus(200);
 };
