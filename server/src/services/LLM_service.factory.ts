@@ -1,5 +1,5 @@
-import { HuggingFaceLLMServiceClass } from '../classes/huggingFaceLLM.service.class.ts';
-import { ILLMServiceBaseClass } from '../classes/LLM-service.base.class.ts';
+import { LLM_service_huggingFaceClass } from '../classes/LLM_service_huggingFace.class.ts';
+import { ILLMServiceBaseClass } from '../classes/LLM.base.class.ts';
 
 export enum ELLMServiceType {
     HuggingFace = 'huggingface',
@@ -15,11 +15,11 @@ export enum EHuggingFaceEmbeddingsModel {
  * LLM service factory class with static method
  * which return the correct service instance on type [ELLMServiceType]
  */
-class LLMServiceFactory {
+class LLM_serviceFactory {
     static createService<T extends ILLMServiceBaseClass>(type: ELLMServiceType): T {
         switch (type) {
             case ELLMServiceType.HuggingFace:
-                return new HuggingFaceLLMServiceClass({
+                return new LLM_service_huggingFaceClass({
                     model: EHuggingFaceModel.Mistral7B,
                     embeddingsModel: EHuggingFaceEmbeddingsModel.SentenceMiniLm,
                     RAGScrapUrl: 'https://airport.wroclaw.pl/pasazer/odlatuje/poradnik-przed-odlotem/',
@@ -39,5 +39,5 @@ class LLMServiceFactory {
  * @param type
  */
 export function initLLMService<T extends ILLMServiceBaseClass>(type: ELLMServiceType): T {
-    return LLMServiceFactory.createService<T>(type);
+    return LLM_serviceFactory.createService<T>(type);
 }

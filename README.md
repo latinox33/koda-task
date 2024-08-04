@@ -1,5 +1,11 @@
 # KODA Task - Wyszukiwarka Lotów i Asystent Podróżnych
 
+
+<img src="/screens/koda-task_1.png" alt="koda-task_1" width="300"/>
+<img src="/screens/koda-task_2.png" alt="koda-task_2" width="300"/>
+<img src="/screens/koda-task_3.png" alt="koda-task_3" width="300"/>
+
+
 ## Opis Projektu
 
 Projekt to wirtualny asystent, który umożliwia wyszukiwanie lotów z Wrocławia przy użyciu SerpAPI Google Flights. Dodatkowo, dzięki implementacji metody Retrieval-Augmented Generation (RAG), odpowiedzi są wzbogacane o dodatkowe informacje dla podróżnych, pobierane z oficjalnej strony lotniska we Wrocławiu.
@@ -13,7 +19,7 @@ Projekt został podzielony na dwa główne moduły: serwer i klient, które znaj
 
 ### Skalowalność
 
-Projekt został zaprojektowany w sposób łatwy do skalowania. Nowe modele LLM można dodać poprzez rozszerzenie klasy `LLMServiceBaseClass`, która definiuje podstawową strukturę systemu. Dodanie nowych klas obsługujących inne modele LLM pozwala na rozbudowę funkcjonalności projektu o nowe algorytmy i rozwiązania.
+Projekt został zaprojektowany w sposób łatwy do skalowania. Nowe modele LLM można dodać poprzez rozszerzenie klasy `LLMBaseClass`, która definiuje podstawową strukturę systemu. Dodanie nowych klas obsługujących inne modele LLM pozwala na rozbudowę funkcjonalności projektu o nowe algorytmy i rozwiązania.
 
 ## Wymagania
 
@@ -62,6 +68,8 @@ PINECONE_INDEX=quickstart
 ```
 
 ### Krok 4: Uruchomienie projektu
+
+Wersja rekomendowana:
 
 Aby uruchomić projekt w trybie developerskim, wykonaj następujące kroki:
 ```bash

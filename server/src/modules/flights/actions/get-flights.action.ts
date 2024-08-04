@@ -5,10 +5,10 @@ import {
     getSecondFlightsAnalysisPrompt,
 } from '../../../utils/analysis.prompt.ts';
 import { IFlight, IFlightInfo, IFlightSummary } from '../../../interfaces/flights.interface.ts';
-import { ELLMServiceType, initLLMService } from '../../../services/LLM.service.factory.ts';
-import { IHuggingFaceLLMService } from '../../../classes/huggingFaceLLM.service.class.ts';
-import { EFlightsServiceType, initFlightsService } from '../../../services/flights.service.factory.ts';
-import { IFlightsSerpApiService } from '../../../classes/flights-serp-api.service.class.ts';
+import { ELLMServiceType, initLLMService } from '../../../services/LLM_service.factory.ts';
+import { IHuggingFaceLLMService } from '../../../classes/LLM_service_huggingFace.class.ts';
+import { EFlightsServiceType, initFlightsService } from '../../../services/Flights_service.factory.ts';
+import { IFlightsSerpApiService } from '../../../classes/Flights_service_serpapi.class.ts';
 
 /**
  * POST
@@ -91,15 +91,4 @@ export const getFlightsAction = async (req: Request, res: Response) => {
     }
 
     return res.json({ status: 'OK', message: summaryMessage });
-};
-
-/**
- * GET
- * Method to check module is alive
- *
- * @param _req
- * @param res
- */
-export const checkHealth = async (_req: Request, res: Response) => {
-    return res.sendStatus(200);
 };

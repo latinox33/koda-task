@@ -14,7 +14,7 @@ export interface ILLMServiceBaseClass {
  * @doc https://js.langchain.com/v0.1/docs/modules/memory/types/buffer/
  * This class contains definitions of basic methods to support LLM
  */
-export abstract class LLMServiceBaseClass<T extends LLMType> implements ILLMServiceBaseClass {
+export abstract class LLMBaseClass<T extends LLMType> implements ILLMServiceBaseClass {
     protected model: T;
     protected config: LLMModelConfig;
     protected memory: BufferMemory | undefined;
@@ -82,7 +82,7 @@ export abstract class LLMServiceBaseClass<T extends LLMType> implements ILLMServ
      *
      * @protected
      */
-    protected clearConversationHistory(): void {
+    protected clearMemory(): void {
         this.memory?.clear();
     }
 }

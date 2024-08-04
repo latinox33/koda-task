@@ -1,4 +1,4 @@
-import { FlightsServiceBaseClass, IFlightsServiceBaseClass } from './flights-service.base.class.ts';
+import { FlightsBaseClass, IFlightsServiceBaseClass } from './Flights.base.class.ts';
 import {
     ISerpApiFlightsRequestParams,
     ISerpApiFlightsResponse,
@@ -20,7 +20,7 @@ export interface IFlightsSerpApiService extends IFlightsServiceBaseClass {
  *
  * You need SERPAPI_API_KEY in .env
  */
-export class FlightsSerpApiServiceClass extends FlightsServiceBaseClass implements IFlightsSerpApiService {
+export class Flights_service_serpapiClass extends FlightsBaseClass implements IFlightsSerpApiService {
     constructor() {
         super();
     }

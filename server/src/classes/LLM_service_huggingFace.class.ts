@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import path from 'path';
-import { ILLMServiceBaseClass, LLMServiceBaseClass } from './LLM-service.base.class.ts';
+import { ILLMServiceBaseClass, LLMBaseClass } from './LLM.base.class.ts';
 import { HuggingFaceInference } from '@langchain/community/llms/hf';
 import { HuggingFaceInferenceEmbeddings } from '@langchain/community/embeddings/hf';
 import { IRagService, RAGService } from '../services/RAG.service.ts';
@@ -22,10 +22,7 @@ dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
  * You need HUGGINGFACE_API_KEY in .env
  * You need PINECONE_INDEX and PINECONE_API_KEY in .env if you use embeddings
  */
-export class HuggingFaceLLMServiceClass
-    extends LLMServiceBaseClass<HuggingFaceInference>
-    implements IHuggingFaceLLMService
-{
+export class LLM_service_huggingFaceClass extends LLMBaseClass<HuggingFaceInference> implements IHuggingFaceLLMService {
     private readonly ragService: IRagService | undefined;
     private readonly embeddings: HuggingFaceInferenceEmbeddings | undefined;
 

@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import { checkHealth, getFlightsAction } from './actions/get-flights.action.ts';
+import { getFlightsAction } from './actions/get-flights.action.ts';
+import { healthAction } from './actions/health.action.ts';
 
 /**
  * Method to generate module routes
@@ -7,7 +8,7 @@ import { checkHealth, getFlightsAction } from './actions/get-flights.action.ts';
 function getRoutes() {
     const router = Router();
 
-    router.get('/health', checkHealth);
+    router.get('/health', healthAction);
     router.post('/get-flights', getFlightsAction);
 
     return router;

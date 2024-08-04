@@ -5,18 +5,15 @@ import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
-    const env: Record<string, string> = loadEnv(mode, path.resolve(__dirname, '..'), 'VITE_');
+    const env: Record<string, string> = loadEnv(mode, path.resolve(__dirname, '../'), 'VITE_');
     const HOST = env.VITE_HOST || 'localhost';
     const PORT = parseInt(env.VITE_PORT, 10) || 5173;
 
     return {
         plugins: [vue(), UnoCSS()],
         define: {
-            'process.env': env,
+            __APP_ENV__: env,
         },
-        server: {
-            host: HOST,
-            port: PORT,
-        },
+        server: { host: HOST, port: PORT },
     };
 });
