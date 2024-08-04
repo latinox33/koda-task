@@ -4,32 +4,39 @@ import {
     ISerpApiFlightsResponse,
     ISerpApiFlightsResponseFights,
     ISerpApiFlightsResponseFightsDetails,
+    SerpApiFlightsResponse,
+    SerpApiSearchFlightsParams,
 } from '../interfaces/serp-api-flights.interface.ts';
 import { getJson } from 'serpapi';
 import { IFlightSummary } from '../interfaces/flights.interface.ts';
 
-interface SerpApiSearchFlightsParams {
-    from: string;
-    to: string;
-    date: string;
-    returnDate: string;
-}
-interface SerpApiFlightsResponse {
-    bestFlights: IFlightSummary[][];
-    otherFlights: IFlightSummary[][];
-}
 export interface IFlightsSerpApiService extends IFlightsServiceBaseClass {
     searchFlights<T = SerpApiFlightsResponse, P = SerpApiSearchFlightsParams>(params: P): Promise<T>;
 }
+
+/**
+ * SerpAPI with Google Flights API class
+ * to search flights.
+ *
+ * You need SERPAPI_API_KEY in .env
+ */
 export class FlightsSerpApiServiceClass extends FlightsServiceBaseClass implements IFlightsSerpApiService {
     constructor() {
         super();
     }
 
+    /**
+     * Method to search flights
+     * and parse results on best and other flights
+     * @doc https://serpapi.com/google-flights-api
+     *
+     * @param params
+     */
     async searchFlights<T = Promise<SerpApiFlightsResponse>, P = SerpApiSearchFlightsParams>(params: P): Promise<T> {
         try {
             const { from, to, date, returnDate }: SerpApiSearchFlightsParams = params as SerpApiSearchFlightsParams;
 
+            // @todo: change to main engine and check env exists in constructor and add serapi engine in interface config
             const result = await this.getFlightsDetails<ISerpApiFlightsResponse>({
                 engine: 'google_flights',
                 departure_id: from,
@@ -52,10 +59,23 @@ export class FlightsSerpApiServiceClass extends FlightsServiceBaseClass implemen
         }
     }
 
+    /**
+     * Get JSON result from SerpAPI by params
+     * @doc https://serpapi.com/search-api
+     *
+     * @param params
+     * @private
+     */
     private async getFlightsDetails<T>(params: ISerpApiFlightsRequestParams): Promise<T> {
         return (await getJson(params)) as T;
     }
 
+    /**
+     * Method to parse SerpAPI result
+     *
+     * @param flights
+     * @private
+     */
     private prepareFlightsCallback(flights: ISerpApiFlightsResponseFights): IFlightSummary[] {
         return flights.flights.map((item: ISerpApiFlightsResponseFightsDetails): IFlightSummary => {
             return {

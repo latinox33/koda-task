@@ -5,6 +5,10 @@ export enum EFlightsServiceType {
     SerpApi = 'serpApi',
 }
 
+/**
+ * Flights service factory class with static method
+ * which returns the correct service instance on type [EFlightsServiceType]
+ */
 class FlightsServiceFactory {
     static createService<T extends IFlightsServiceBaseClass>(type: EFlightsServiceType): T {
         switch (type) {
@@ -16,6 +20,11 @@ class FlightsServiceFactory {
     }
 }
 
+/**
+ * Factory init method to create service
+ *
+ * @param type
+ */
 export function initFlightsService<T extends IFlightsServiceBaseClass>(type: EFlightsServiceType): T {
     return FlightsServiceFactory.createService<T>(type);
 }

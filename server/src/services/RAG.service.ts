@@ -6,15 +6,25 @@ import path from 'path';
 import { HuggingFaceInference } from '@langchain/community/llms/hf';
 import * as cheerio from 'cheerio';
 import { IFlightInfo } from '../interfaces/flights.interface.ts';
-import { LLMModelConfig } from '../classes/LLM-service.base.class.ts';
+import { LLMModelConfig } from '../interfaces/llm.interface.ts';
 
 dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 
-interface IRagService {
+export interface IRagService {
     initialize(): Promise<void>;
     query(question: string, flightInfo: IFlightInfo): Promise<string>;
 }
 
+/**
+ * RAG Service class
+ * with pinecone vector store implementation
+ *
+ * to fetch site page content by URL
+ * and use embeddings to generate message
+ *
+ * @doc https://js.langchain.com/v0.2/docs/tutorials/rag/
+ * @doc https://docs.pinecone.io/guides/get-started/quickstart
+ */
 export class RAGService implements IRagService {
     private readonly indexName: string;
 
@@ -24,6 +34,14 @@ export class RAGService implements IRagService {
     private textSplitter: RecursiveCharacterTextSplitter;
     private config: LLMModelConfig;
 
+    /**
+     * In constructor initiate pinecone vector store and text splitter instances
+     *
+     * @param indexName
+     * @param model
+     * @param embeddings
+     * @param config
+     */
     constructor(
         indexName: string,
         model: HuggingFaceInference,
@@ -43,12 +61,23 @@ export class RAGService implements IRagService {
         this.config = config;
     }
 
+    /**
+     * Main method to initiate all process
+     * fetch site page, scrap to chunks and create vector store
+     */
     async initialize(): Promise<void> {
         const content = await this.scrapeWebsite(this.config.RAGScrapUrl!);
         const chunks = await this.chunkText(content);
         await this.createVectorStore(chunks);
     }
 
+    /**
+     * Method to fetch site page and parsing HTML to text
+     *
+     * @doc https://github.com/cheeriojs/cheerio
+     * @param url
+     * @private
+     */
     private async scrapeWebsite(url: string): Promise<string> {
         const response = await fetch(url);
         const responseText = await response.text();
@@ -56,10 +85,29 @@ export class RAGService implements IRagService {
         return $('body').text();
     }
 
+    /**
+     * Split text to chunks
+     *
+     * @doc https://js.langchain.com/v0.2/docs/how_to/contextual_compression/#embeddingsfilter
+     * @param text
+     * @private
+     */
     private async chunkText(text: string): Promise<string[]> {
         return this.textSplitter.splitText(text);
     }
 
+    /**
+     * Method to create vector store
+     * and return parsed embeddings for chunks
+     *
+     * @doc https://js.langchain.com/v0.2/docs/integrations/text_embedding/hugging_face_inference/#usage
+     * @doc https://huggingface.co/blog/getting-started-with-embeddings
+     * @doc https://github.com/huggingface/text-embeddings-inference
+     * @doc https://docs.pinecone.io/guides/data/upsert-data
+     * @doc
+     * @param chunks
+     * @private
+     */
     private async createVectorStore(chunks: string[]): Promise<void> {
         const index = this.pc.Index(this.indexName);
         for (let i = 0; i < chunks.length; i++) {
@@ -74,6 +122,16 @@ export class RAGService implements IRagService {
         }
     }
 
+    /**
+     * Method to question embeddings
+     * and init LLM model call to parse results
+     *
+     * @doc https://js.langchain.com/v0.2/docs/integrations/text_embedding/hugging_face_inference/#usage
+     * @doc https://huggingface.co/blog/getting-started-with-embeddings
+     * @doc https://github.com/huggingface/text-embeddings-inference
+     * @param question
+     * @param flightInfo
+     */
     async query(question: string, flightInfo: IFlightInfo): Promise<string> {
         const index = this.pc.Index(this.indexName);
         const questionEmbed = await this.embeddings.embedQuery(question);

@@ -1,5 +1,7 @@
 import { IFlightSummary } from '../interfaces/flights.interface.ts';
 
+// @todo: change to Map() and parser for variables. And change from utils to composables
+
 export function getFlightsAnalysisPrompt(userPrompt: string) {
     return `Today is ${new Date().toISOString()}.
     Analyze a user query in Polish regarding a flight from Wrocław.

@@ -9,7 +9,7 @@ Projekt został podzielony na dwa główne moduły: serwer i klient, które znaj
 ### Technologie
 
 - **Serwer:** Node.js, Express, TypeScript, Cheerio, Langchain, Huggingface, Pinecone, CORS, Helmet.
-- **Klient:** Vite, Vue.js.
+- **Klient:** Vite, Vue.js, UnoCSS
 
 ### Skalowalność
 

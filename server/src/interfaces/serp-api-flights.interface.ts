@@ -1,3 +1,5 @@
+import { IFlightSummary } from './flights.interface.ts';
+
 interface ISerpApiFlightsResponseSearchMetadata {
     id: string;
     status: string;
@@ -79,4 +81,15 @@ export interface ISerpApiFlightsRequestParams {
     outbound_date: string;
     return_date: string;
     api_key: string;
+}
+
+export interface SerpApiSearchFlightsParams {
+    from: string;
+    to: string;
+    date: string;
+    returnDate: string;
+}
+export interface SerpApiFlightsResponse {
+    bestFlights: IFlightSummary[][];
+    otherFlights: IFlightSummary[][];
 }

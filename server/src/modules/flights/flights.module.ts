@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import { checkHealth, getFlightsAction } from './actions/get-flights.action.ts';
 
+/**
+ * Method to generate module routes
+ */
 function getRoutes() {
     const router = Router();
 
@@ -10,7 +13,13 @@ function getRoutes() {
     return router;
 }
 
+/**
+ * Main method to init module routes
+ *
+ * @param router
+ */
 export function initFlightsModule(router: Router) {
+    // @todo: change to base class with init methods for future modules
     console.log('\x1b[0m\x1b[40m\x1b[33m  -- Init Flights Module\x1b[0m');
     router.use('/flights', getRoutes());
 }

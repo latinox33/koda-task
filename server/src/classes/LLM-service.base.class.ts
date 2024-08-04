@@ -1,37 +1,33 @@
 import { BufferMemory } from 'langchain/memory';
 import { ConversationChain } from 'langchain/chains';
-import { BaseLanguageModelInput, BaseLanguageModelInterface } from '@langchain/core/language_models/base';
-import { Runnable } from '@langchain/core/runnables';
-import type { BaseMessage } from '@langchain/core/messages';
-
-type LLMType =
-    | BaseLanguageModelInterface
-    | Runnable<BaseLanguageModelInput, string>
-    | Runnable<BaseLanguageModelInput, BaseMessage>;
-
-export interface LLMModelConfig {
-    model: string;
-    embeddingsModel?: string;
-    RAGScrapUrl?: string;
-    maxTokens: number;
-    temperature: number;
-    enable?: {
-        conversationChain?: boolean;
-        embeddings?: boolean;
-    };
-}
+import { LLMModelConfig, LLMType } from '../interfaces/llm.interface.ts';
 
 export interface ILLMServiceBaseClass {
     call(prompt: string): Promise<string>;
     conversationCall(prompt: string): Promise<string>;
 }
 
+/**
+ * Base class for LLM services
+ * Can extend by any LLM type
+ *
+ * @doc https://js.langchain.com/v0.1/docs/modules/memory/types/buffer/
+ * This class contains definitions of basic methods to support LLM
+ */
 export abstract class LLMServiceBaseClass<T extends LLMType> implements ILLMServiceBaseClass {
     protected model: T;
     protected config: LLMModelConfig;
     protected memory: BufferMemory | undefined;
     protected conversationChain: ConversationChain | undefined;
 
+    /**
+     * In constructor is defined model and config
+     * Additional BufferMemory and ConversationChain if enabled
+     *
+     * @param model
+     * @param config
+     * @protected
+     */
     protected constructor(model: T, config: LLMModelConfig) {
         this.model = model;
         this.config = config;
@@ -45,8 +41,19 @@ export abstract class LLMServiceBaseClass<T extends LLMType> implements ILLMServ
         }
     }
 
+    /**
+     * Main abstract method to define call to LLM
+     *
+     * @param prompt
+     */
     abstract call(prompt: string): Promise<string>;
 
+    /**
+     * Main method to call conversation chain
+     * and log response
+     *
+     * @param prompt
+     */
     async conversationCall(prompt: string): Promise<string> {
         if (!this.config.enable?.conversationChain || !this.conversationChain) {
             throw new Error('Conversation chain is not enabled');
@@ -56,6 +63,13 @@ export abstract class LLMServiceBaseClass<T extends LLMType> implements ILLMServ
         return response.response;
     }
 
+    /**
+     * Method to log LLM call response
+     *
+     * @param _prompt
+     * @param response
+     * @protected
+     */
     protected logResponse(_prompt: string, response: string): void {
         console.log(`
             ___ RESPONSE
@@ -63,6 +77,11 @@ export abstract class LLMServiceBaseClass<T extends LLMType> implements ILLMServ
         `);
     }
 
+    /**
+     * Method to clear memory
+     *
+     * @protected
+     */
     protected clearConversationHistory(): void {
         this.memory?.clear();
     }

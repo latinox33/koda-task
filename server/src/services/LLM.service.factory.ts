@@ -11,6 +11,10 @@ export enum EHuggingFaceEmbeddingsModel {
     SentenceMiniLm = 'sentence-transformers/all-MiniLM-L6-v2',
 }
 
+/**
+ * LLM service factory class with static method
+ * which return the correct service instance on type [ELLMServiceType]
+ */
 class LLMServiceFactory {
     static createService<T extends ILLMServiceBaseClass>(type: ELLMServiceType): T {
         switch (type) {
@@ -29,6 +33,11 @@ class LLMServiceFactory {
     }
 }
 
+/**
+ * Factory init method to create service
+ *
+ * @param type
+ */
 export function initLLMService<T extends ILLMServiceBaseClass>(type: ELLMServiceType): T {
     return LLMServiceFactory.createService<T>(type);
 }

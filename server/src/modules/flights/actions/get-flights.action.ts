@@ -10,6 +10,14 @@ import { IHuggingFaceLLMService } from '../../../classes/huggingFaceLLM.service.
 import { EFlightsServiceType, initFlightsService } from '../../../services/flights.service.factory.ts';
 import { IFlightsSerpApiService } from '../../../classes/flights-serp-api.service.class.ts';
 
+/**
+ * POST
+ * Action to prepare user prompt to search flights from Wroclaw
+ * and return message with summary or suggestion to get more information
+ *
+ * @param req
+ * @param res
+ */
 export const getFlightsAction = async (req: Request, res: Response) => {
     const { promptText, isNextMessage }: { promptText: string; isNextMessage: boolean } = req.body;
     if (!promptText) {
@@ -85,6 +93,13 @@ export const getFlightsAction = async (req: Request, res: Response) => {
     return res.json({ status: 'OK', message: summaryMessage });
 };
 
+/**
+ * GET
+ * Method to check module is alive
+ *
+ * @param _req
+ * @param res
+ */
 export const checkHealth = async (_req: Request, res: Response) => {
     return res.sendStatus(200);
 };
