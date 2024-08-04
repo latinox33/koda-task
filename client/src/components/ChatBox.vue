@@ -24,13 +24,14 @@ import ChatBoxMessages from './ChatBoxMessages.vue';
 import { useFetch } from '@vueuse/core';
 import { IBubbleMessageProperties, IMessage } from '../interfaces/messages.interface.ts';
 
-const url = ref<string>('http://localhost:3000/api/flights/get-flights');
+const url = ref<string>(`${import.meta.env.VITE_API_ORIGIN}/api/flights/get-flights`);
 
 const promptText = ref<string>('');
 const messages = ref<IBubbleMessageProperties[]>([]);
 let intervalId: ReturnType<typeof setTimeout>;
 
 const sendMessage = async (): Promise<void> => {
+    console.log(url.value);
     if (!promptText.value) return;
 
     messages.value.push({

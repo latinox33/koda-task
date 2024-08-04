@@ -6,7 +6,13 @@ export function initializeWebServer(): { app: Express; startServer: () => void }
     const app = express();
     const port = process.env.SERVER_PORT || 3000;
 
-    app.use(cors());
+    app.use(
+        cors({
+            origin: process.env.CLIENT_ORIGIN,
+            methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+            allowedHeaders: ['Content-Type'],
+        }),
+    );
     app.use(helmet());
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));

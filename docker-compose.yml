@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: ./server
+      args:
+        SERVER_PORT: ${SERVER_PORT}
+    env_file: .env
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    command: npm run dev
+    working_dir: /app/src
+
+  client:
+    build:
+      context: ./client
+      args:
+        VITE_PORT: ${VITE_PORT}
+    env_file: .env
+    ports:
+      - "${VITE_PORT}:${VITE_PORT}"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    command: npm run dev
+    working_dir: /app/src
