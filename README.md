@@ -1,9 +1,11 @@
 # KODA Task - Wyszukiwarka Lotów i Asystent Podróżnych
 
 
+<p float="left">
 <img src="/screens/koda-task_1.png" alt="koda-task_1" width="300"/>
 <img src="/screens/koda-task_2.png" alt="koda-task_2" width="300"/>
 <img src="/screens/koda-task_3.png" alt="koda-task_3" width="300"/>
+</p>
 
 
 ## Opis Projektu
