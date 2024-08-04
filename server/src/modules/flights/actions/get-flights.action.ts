@@ -1,6 +1,9 @@
 import type { Request, Response } from 'express';
-// import { getFlightsAnalysisPrompt } from '../../../utils/analysis.prompt.ts';
-import { getFlightsSummaryPrompt } from '../../../utils/analysis.prompt.ts';
+import {
+    getFlightsAnalysisPrompt,
+    getFlightsSummaryPrompt,
+    getSecondFlightsAnalysisPrompt,
+} from '../../../utils/analysis.prompt.ts';
 import { IFlight, IFlightInfo, IFlightSummary } from '../../../interfaces/flights.interface.ts';
 import { ELLMServiceType, initLLMService } from '../../../services/LLM.service.factory.ts';
 import { IHuggingFaceLLMService } from '../../../classes/huggingFaceLLM.service.class.ts';
@@ -8,7 +11,7 @@ import { EFlightsServiceType, initFlightsService } from '../../../services/fligh
 import { IFlightsSerpApiService } from '../../../classes/flights-serp-api.service.class.ts';
 
 export const getFlightsAction = async (req: Request, res: Response) => {
-    const { promptText } = req.body;
+    const { promptText, isNextMessage }: { promptText: string; isNextMessage: boolean } = req.body;
     if (!promptText) {
         return res.sendStatus(400);
     }
@@ -18,19 +21,9 @@ export const getFlightsAction = async (req: Request, res: Response) => {
 
     let parsedResult: IFlight;
     try {
-        // const analysisResult = await llmService.generateResponse(getFlightsAnalysisPrompt(promptText));
-        parsedResult = {
-            isValidQuery: true,
-            destination: 'POZ',
-            dateModel: {
-                date: '21.08.2024',
-                fullDate: '2024-08-21',
-                returnFullDate: '2024-08-28',
-            },
-            missingInfo: [],
-            suggestion: null,
-        };
-        // parsedResult = JSON.parse(analysisResult) as IFlight;
+        const analysisPromptCallback = isNextMessage ? getSecondFlightsAnalysisPrompt : getFlightsAnalysisPrompt;
+        const analysisResult = await llmService.conversationCall(analysisPromptCallback(promptText));
+        parsedResult = JSON.parse(analysisResult) as IFlight;
     } catch (e) {
         console.error('Parse error', e);
         return res.json({ status: 'Error', message: 'Error :(' });
@@ -44,7 +37,9 @@ export const getFlightsAction = async (req: Request, res: Response) => {
     }
 
     if (parsedResult.missingInfo.length) {
-        const message = `Aby pomóc Ci znaleźć lot, potrzebuję jeszcze następujących informacji: ${parsedResult.missingInfo.join(', ')}. ${parsedResult.suggestion}`;
+        const message =
+            parsedResult.suggestion ||
+            `Aby pomóc Ci znaleźć lot, potrzebuję jeszcze następujących informacji: ${parsedResult.missingInfo.join(', ')}. ${parsedResult.suggestion}`;
         return res.json({ status: 'Missing', message: message });
     }
 
@@ -72,11 +67,16 @@ export const getFlightsAction = async (req: Request, res: Response) => {
         return res.json({ status: 'Missing', message: message });
     }
 
+    let additionalMessage: string = '';
+    try {
+        additionalMessage = await llmService.queryRAG('Wymień kilka informacji i porad dla podróżnych', flightInfo);
+    } catch (e) {
+        console.error('Prepare additional message by RAG error', e);
+    }
+
     let summaryMessage;
     try {
-        summaryMessage = summaryMessage = await llmService.generateResponse(
-            getFlightsSummaryPrompt(flights, flightInfo),
-        );
+        summaryMessage = summaryMessage = await llmService.call(getFlightsSummaryPrompt(flights, additionalMessage));
     } catch (e) {
         console.error('Summary error', e);
         return res.json({ status: 'Error', message: 'Error summary :(' });

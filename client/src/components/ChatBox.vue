@@ -4,10 +4,11 @@
       Chat box
     </h2>
     <ChatBoxMessages :messages="messages" />
-    <div class="w-full flex gap-2">
+    <div class="w-full flex gap-2 mt-3">
       <input
         v-model.trim="promptText"
         class="bg-transparent b-none b-b-solid b-b-[#011638] text-[#011638] w-full outline-none"
+        placeholder="Poszukaj lotów z Wrocławia do ..."
         @keyup.enter="sendMessage"
       />
       <button @click="sendMessage">
@@ -59,7 +60,9 @@ const sendMessage = async (): Promise<void> => {
         });
     }, 500);
 
-    const { data: responseData } = await useFetch(url).post({ promptText: _promptText }).json();
+    const { data: responseData } = await useFetch(url)
+        .post({ promptText: _promptText, isNextMessage: messages.value.length > 1 })
+        .json();
     updateMessage(responseData.value);
 };
 

@@ -1,60 +1,144 @@
-import { IFlightInfo, IFlightSummary } from '../interfaces/flights.interface.ts';
+import { IFlightSummary } from '../interfaces/flights.interface.ts';
 
 export function getFlightsAnalysisPrompt(userPrompt: string) {
-    return `
-        Przeanalizuj następujące zapytanie o lot z Wrocławia i wyodrębnij miejsce docelowe oraz datę (jeśli podano):
-        "${userPrompt}"
+    return `Today is ${new Date().toISOString()}.
+    Analyze a user query in Polish regarding a flight from Wrocław.
+    User query:
+    "${userPrompt}"
+     
+    Your main task is to extract the destination and the departure and return dates from Wrocław.
     
-        Jeśli zapytanie nie dotyczy lotu z Wrocławia lub brakuje kluczowych informacji, zasugeruj dopytanie o szczegóły.
-        Jeżeli nie podano daty to uwzględnij najbliższy tydzień. Jeżeli nie podano miejsca docelowego to 
-        zasugeruj najpopularniejsze kierunki odlotów z Wrocławia.
+    As a response, you should return only an object with the following structure:
+    {
+        "isValidQuery": boolean,
+        "destination": string | null,
+        "dateModel": {
+            "date": string,
+            "fullDate": string,
+            "returnFullDate": string
+        },
+        "missingInfo": string[],
+        "suggestion": string | null
+    }
+
+    Field descriptions:
+    - isValidQuery: Should indicate whether all necessary information to find the flight was determined.
+    - destination: Should indicate the arrival airport code, e.g., POZ for Poznań or KRK for Kraków.
+    - date: Departure date in DD.MM.YYYY format. Mandatory field.
+    - fullDate: Departure date in YYYY-MM-DD format. Mandatory field.
+    - returnFullDate: Return date in YYYY-MM-DD format. Mandatory field.
+    - missingInfo: List of missing information, e.g., ['destination', 'fullDate'].
+    - suggestion: Suggestion for additional information in Polish.
+
+    If only the return date is missing, fill it with a date in YYYY-MM-DD format, 7 days after the departure date. Otherwise, set it to \`null\` and write a suggestion to ask for the return date.
+    If any information is missing, the \`suggestion\` field should always contain a request for that information in Polish.
+    If any information couldn't be obtained, the object should still have all fields, but their values should be \`null\`.
+    Fields marked as "Mandatory field" must be filled for \`isValidQuery\` to be \`true\`.
+    Analyze the Polish query and return only the JSON object described above, without any additional explanations or text.
     
-        Odpowiedz w formacie JSON:
-        {
-            "isValidQuery": boolean,
-            "destination": string | null,
-            "dateModel": {
-                "date": string,
-                "fullDate": string,
-                "returnFullDate": string
-            },
-            "missingInfo": string[],
-            "suggestion": string | null
-        }
+    Return only then JSON object without additional explanations or text.
     
-        isValidQuery - powinno wskazywać czy udało się zinterpretować zapytanie o loty z Wrocławia
-        destination - powinno wskazywać kod lotniska wylotu lub lokalizację kgmid (na przykład zamiast 
-            Poznań powinno być POZ, Kraków-Balice jako KRK)
-        dateModel - obiekt z kilkoma parametrami. Parametr date powinien być datą, którą wyświetlę użytkownikowi więc 
-            powinna być w formacie dd.mm.yyyy. Parametry fullDate oraz returnFullDate powinny być w formacie YYYY-MM-DD. 
-            Jeżeli nie uda Ci się określić daty powrotu z wypowiedzi użytkownika to domyślnie wpisz tutaj 7 dni od daty fullDate.
-            Parametr fullDate powinien określać datę wylotu.
-        missingInfo - lista brakujących informacji
-        suggestion - sugestia dopytania, jeśli potrzebne
-  `;
+    Examples:
+    1. If the query is "I want to fly from Wrocław to Kraków on the 5th of August and return on the 10th of August", the response might look like this:
+    \`\`\`{ "isValidQuery": true, "destination": "KRK", "dateModel": { "date": "05.08.2024", "fullDate": "2024-08-05", "returnFullDate": "2024-08-10" }, "missingInfo": [], "suggestion": null }\`\`\`
+    
+    2. If the query is incomplete, such as "I want to fly from Wrocław on the 5th of August", the response might look like this:
+    \`\`\`{ "isValidQuery": false, "destination": null, "dateModel": { "date": "05.08.2024", "fullDate": "2024-08-05", "returnFullDate": null }, "missingInfo": ["destination", "returnFullDate"], "suggestion": "Proszę podać miejsce docelowe oraz datę powrotu." }\`\`\`
+    
+    3. If the the is incomplete, such as "I want to fly to Berlin, 21th of August", the response might look like this:
+    \`\`\`{ "isValidQuery": true, "destination": "BER", "dateModel": { "date": "21.08.2024", "fullDate": "2024-08-21", "returnFullDate": "2024-08-28 }, "missingInfo": [], "suggestion": null }\`\`\`
+    `;
+}
+
+export function getSecondFlightsAnalysisPrompt(userPrompt: string) {
+    return `Today is ${new Date().toISOString()}.
+    You are part of a conversation chain processing flight queries from Wrocław. 
+    New user query: 
+    "${userPrompt}"
+    
+    Your task is to analyze the entire conversation history, including the initial query and any subsequent user responses, to complete or update the flight information object.
+    Review the conversation history and focus on any new information provided by the user. Update the flight information object based on this new data. The object structure remains the same as in the initial prompt:
+    {
+        "isValidQuery": boolean,
+        "destination": string | null,
+        "dateModel": {
+            "date": string,
+            "fullDate": string,
+            "returnFullDate": string
+        },
+        "missingInfo": string[],
+        "suggestion": string | null
+    }
+
+    Follow these steps:
+    1. Analyze new information in the context of the entire conversation.
+    2. Update relevant fields in the object with any newly provided information.
+    3. If all mandatory information is now complete, set "isValidQuery" to true.
+    4. If information is still missing, update the "missingInfo" array and "suggestion" field accordingly.
+    5. If only the return date is missing, set "returnFullDate" to 7 days after "fullDate".
+
+    Remember:
+    - Maintain the same object structure, even if some fields remain null.
+    - Update "suggestion" in Polish to request any still-missing information.
+    - Ensure "date", "fullDate", and either a valid "returnFullDate" or a suggestion for it are present for "isValidQuery" to be true.
+    - This prompt may be used multiple times in the conversation, so always consider the full context.
+
+    Return only the updated JSON object without additional explanations or text.
+    
+    Examples:
+    1. If the query is "I want to fly from Wrocław to Kraków on the 5th of August and return on the 10th of August", the response might look like this:
+    \`\`\`{ "isValidQuery": true, "destination": "KRK", "dateModel": { "date": "05.08.2024", "fullDate": "2024-08-05", "returnFullDate": "2024-08-10" }, "missingInfo": [], "suggestion": null }\`\`\`
+    
+    2. If the query is incomplete, such as "I want to fly from Wrocław on the 5th of August", the response might look like this:
+    \`\`\`{ "isValidQuery": false, "destination": null, "dateModel": { "date": "05.08.2024", "fullDate": "2024-08-05", "returnFullDate": null }, "missingInfo": ["destination", "returnFullDate"], "suggestion": "Proszę podać miejsce docelowe oraz datę powrotu." }\`\`\`
+    
+    3. If the the is incomplete, such as "I want to fly to Berlin, 21th of August", the response might look like this:
+    \`\`\`{ "isValidQuery": true, "destination": "BER", "dateModel": { "date": "21.08.2024", "fullDate": "2024-08-21", "returnFullDate": "2024-08-28 }, "missingInfo": [], "suggestion": null }\`\`\`
+    `;
 }
 
 export function getFlightsSummaryPrompt(
     flights: { bestFlights: IFlightSummary[][]; otherFlights: IFlightSummary[][] },
-    flightInfo: IFlightInfo,
+    additionalMessage: string,
 ) {
     return `
-        Podsumuj następujące informacje o lotach z Wrocławia do ${flightInfo.destination}:
-        ${JSON.stringify(flights)}
-        
-        Wyniki są podzielone na dwie tablice: bestFlights oraz otherFlights. Może się zdarzyć, że bestFlights 
-        będzie pustą tablicą, ale w takiej sytuacji zaproponujesz inne rozwiązania na podstawie otherFlights. 
-        Jeżeli w tablicy otherFlights w polu flights jest wiele elementów to oznacza, że lot ma przesiadki.
-        Uwzględnij to w podsumowaniu. 
-        
-        Utwórz krótkie, przyjazne dla użytkownika podsumowanie zawierające:
-        1. Liczbę znalezionych lotów
-        2. Zakres cen
-        3. Najkrótszy i najdłuższy czas lotu
-        4. Sugestię najlepszej opcji (np. najtańszy lub najkrótszy lot)
+    You are an AI assistant specializing in flight information analysis. 
+    Your task is to analyze a JSON object containing flight details from Wrocław and generate a concise, user-friendly summary in Polish, not exceeding 300 words.
 
-        Odpowiedź sformatuj w przyjazny dla użytkownika sposób i w języku polskim. Musisz się zmieścić w 300 słowach.
-        W odpowiedzi nie wspominaj nic o danych wejściowych, które otrzymałeś. Jedynie wyciągnij z nich informacje i 
-        uwzględnij w podsumowaniu. Nie wspominaj również nic o "bestFlights" i "otherFlights".
+    The input object has the following structure:
+    {
+        bestFlights: IFlightSummary[][],
+        otherFlights: IFlightSummary[][]
+    }
+
+    Where IFlightSummary is:
+    {
+        airline: string,
+        price: number,
+        duration: number,
+        departure: string,
+        arrival: string
+    }
+
+    Analyze the provided data and create a summary that includes:
+    1. The total number of flights found
+    2. Price range (lowest to highest)
+    3. Shortest and longest flight durations
+    4. Suggestions for the best options, if applicable
+
+    If the 'bestFlights' array is empty, focus on the 'otherFlights' array, which suggests flights with layovers.
+    Your summary should be informative, easy to understand, and tailored for the average traveler. Highlight any particularly good deals or convenient options. If there are multiple flight options, try to provide a balanced overview of the choices available.
+    Remember to keep your response in Polish and within the 300-word limit. Format the text to be easily readable, using appropriate paragraph breaks and bullet points if necessary.
+    Analyze the data thoroughly and provide a summary that will help the user make an informed decision about their flight options from Wrocław.
+    
+    Additionally, analyze additional information for travelers, shorten it and add it to the summary.
+    Answer in no more than 500 words.
+    Return only answer for user without additional explanations or text like "Here's a possible summary".
+    
+    JSON object to analyze:
+    "${JSON.stringify(flights)}"
+    
+    Additional information for travelers:
+    "${additionalMessage}"
     `;
 }

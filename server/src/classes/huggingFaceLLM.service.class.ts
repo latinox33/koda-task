@@ -1,36 +1,75 @@
-import { HfInference } from '@huggingface/inference';
 import dotenv from 'dotenv';
 import path from 'path';
-import { ILLMServiceBaseClass, LLMServiceBaseClass } from './LLM-service.base.class.ts';
+import { ILLMServiceBaseClass, LLMServiceBaseClass, LLMModelConfig } from './LLM-service.base.class.ts';
+import { HuggingFaceInference } from '@langchain/community/llms/hf';
+import { HuggingFaceInferenceEmbeddings } from '@langchain/community/embeddings/hf';
+import { RAGService } from '../services/RAG.service.ts';
+import { IFlightInfo } from '../interfaces/flights.interface.ts';
 
 export interface IHuggingFaceLLMService extends ILLMServiceBaseClass {
-    generateResponse(prompt: string): Promise<string>;
+    call(prompt: string): Promise<string>;
+    queryRAG(question: string, flightInfo: IFlightInfo): Promise<string>;
 }
 
 dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 
-export class HuggingFaceLLMServiceClass extends LLMServiceBaseClass<HfInference> implements IHuggingFaceLLMService {
-    constructor() {
-        super(new HfInference(process.env.HUGGINGFACE_API_KEY), {
-            modelName: 'mistralai/Mistral-7B-Instruct-v0.2',
-            maxTokens: 300,
-            temperature: 0.2,
-        });
+export class HuggingFaceLLMServiceClass
+    extends LLMServiceBaseClass<HuggingFaceInference>
+    implements IHuggingFaceLLMService
+{
+    private readonly ragService: RAGService | undefined;
+    private readonly embeddings: HuggingFaceInferenceEmbeddings | undefined;
+
+    constructor(config: LLMModelConfig) {
+        super(
+            new HuggingFaceInference({
+                ...config,
+                apiKey: process.env.HUGGINGFACE_API_KEY,
+            }),
+            config,
+        );
+
+        if (config.enable?.embeddings) {
+            this.embeddings = new HuggingFaceInferenceEmbeddings({
+                model: config.embeddingsModel,
+                apiKey: process.env.HUGGINGFACE_API_KEY,
+            });
+            this.ragService = new RAGService(process.env.PINECONE_INDEX!, this.model, this.embeddings, config);
+            this.ragService.initialize().then().catch();
+        }
     }
 
-    async generateResponse(prompt: string): Promise<string> {
+    async call(prompt: string): Promise<string> {
         try {
-            const result = await this.model.chatCompletion({
-                model: 'mistralai/Mistral-7B-Instruct-v0.2',
-                messages: [{ role: 'user', content: prompt }],
-                max_tokens: 300,
-                temperature: 0.2,
-            });
-            this.logResponse(prompt as string, result.choices[0].message.content || '');
-            return result.choices[0].message.content || '';
+            const result = await this.model.invoke(prompt, {});
+            this.logResponse(prompt as string, result || '');
+            return result || '';
         } catch (e) {
             console.error('ERR', e);
             throw e;
         }
+    }
+
+    async conversationCall(prompt: string): Promise<string> {
+        if (!this.config.enable?.conversationChain || !this.conversationChain) {
+            throw new Error('Conversation chain is not enabled');
+        }
+        const response = await this.conversationChain.invoke({ input: prompt });
+        this.logResponse(prompt, response.response);
+        const result = this.extractJsonObject(response.response);
+        return result || '';
+    }
+
+    async queryRAG(question: string, flightInfo: IFlightInfo): Promise<string> {
+        if (!this.ragService) throw new Error('RAGService is not set');
+        return await this.ragService.query(question, flightInfo);
+    }
+
+    private extractJsonObject(input: string): string | null {
+        const regex = /(\{(?:[^{}]*|\{(?:[^{}]*|\{[^{}]*\})*\})*\})/;
+        const match = input.match(regex);
+        if (match) return match[0];
+
+        return null;
     }
 }
