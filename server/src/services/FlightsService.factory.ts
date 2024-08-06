@@ -1,5 +1,5 @@
-import { IFlightsServiceBaseClass } from '../classes/Flights.base.class.ts';
-import { Flights_service_serpapiClass } from '../classes/Flights_service_serpapi.class.ts';
+import { IFlightsServiceBaseClass } from '../classes/base/Flights.base.class.ts';
+import { Flights_SerpAPIClass } from '../classes/Flights_SerpAPI.class.ts';
 
 export enum EFlightsServiceType {
     SerpApi = 'serpApi',
@@ -9,11 +9,11 @@ export enum EFlightsServiceType {
  * Flights service factory class with static method
  * which returns the correct service instance on type [EFlightsServiceType]
  */
-class Flights_serviceFactory {
+class FlightsServiceFactory {
     static createService<T extends IFlightsServiceBaseClass>(type: EFlightsServiceType): T {
         switch (type) {
             case EFlightsServiceType.SerpApi:
-                return new Flights_service_serpapiClass() as unknown as T;
+                return new Flights_SerpAPIClass() as unknown as T;
             default:
                 throw new Error(`Wrong Flights service type: ${type}`);
         }
@@ -26,5 +26,5 @@ class Flights_serviceFactory {
  * @param type
  */
 export function initFlightsService<T extends IFlightsServiceBaseClass>(type: EFlightsServiceType): T {
-    return Flights_serviceFactory.createService<T>(type);
+    return FlightsServiceFactory.createService<T>(type);
 }

@@ -79,15 +79,16 @@ export interface ISerpApiFlightsRequestParams {
     arrival_id: string;
     date: string;
     outbound_date: string;
-    return_date: string;
+    return_date?: string;
     api_key: string;
+    type: number;
 }
 
 export interface SerpApiSearchFlightsParams {
     from: string;
     to: string;
     date: string;
-    returnDate: string;
+    returnDate?: string;
 }
 export interface SerpApiFlightsResponse {
     bestFlights: IFlightSummary[][];

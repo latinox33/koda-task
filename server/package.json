@@ -1,42 +1,45 @@
 {
-    "name": "koda-task-server",
-    "type": "commonjs",
-    "scripts": {
-        "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-        "build": "tsc",
-        "start": "node dist/index.js",
-        "lint": "eslint .",
-        "lint:fix": "eslint . --fix",
-        "format": "prettier . --write"
-    },
-    "devDependencies": {
-        "@eslint/eslintrc": "^3.1.0",
-        "@eslint/js": "^9.8.0",
-        "@types/cheerio": "^0.22.35",
-        "@types/cors": "^2.8.17",
-        "@types/express": "^4.17.21",
-        "@types/node": "^22.1.0",
-        "@typescript-eslint/eslint-plugin": "^8.0.0",
-        "@typescript-eslint/parser": "^8.0.0",
-        "eslint": "^9.8.0",
-        "prettier": "^3.3.3",
-        "ts-node-dev": "^2.0.0",
-        "typescript": "^5.5.4"
-    },
-    "peerDependencies": {
-        "typescript": "^5.0.0"
-    },
-    "dependencies": {
-        "@huggingface/inference": "2",
-        "@langchain/community": "^0.2.23",
-        "@langchain/pinecone": "^0.0.8",
-        "@pinecone-database/pinecone": "^3.0.0",
-        "cheerio": "^1.0.0-rc.12",
-        "cors": "^2.8.5",
-        "dotenv": "^16.4.5",
-        "express": "^4.19.2",
-        "helmet": "^7.1.0",
-        "langchain": "^0.2.12",
-        "serpapi": "^2.1.0"
-    }
+  "name": "koda-task-server",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier . --write"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.1.0",
+    "@eslint/js": "^9.8.0",
+    "@types/cheerio": "^0.22.35",
+    "@types/cors": "^2.8.17",
+    "@types/date-fns": "^2.6.0",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.1.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.8.0",
+    "prettier": "^3.3.3",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.5.4"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@huggingface/inference": "2",
+    "@langchain/community": "^0.2.23",
+    "@langchain/pinecone": "^0.0.8",
+    "@pinecone-database/pinecone": "^3.0.0",
+    "cheerio": "^1.0.0-rc.12",
+    "chrono-node": "^2.7.6",
+    "cors": "^2.8.5",
+    "date-fns": "^3.6.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "helmet": "^7.1.0",
+    "langchain": "^0.2.12",
+    "serpapi": "^2.1.0"
+  }
 }

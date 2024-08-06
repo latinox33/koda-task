@@ -1,12 +1,17 @@
-# KODA Task - Wyszukiwarka Lotów i Asystent Podróżnych
+# KODA Task
+## Wyszukiwarka Lotów i Asystent Podróżnych
 
+---
+
+## Screens
 
 <p float="left">
-<img src="/screens/koda-task_1.png" alt="koda-task_1" width="300"/>
-<img src="/screens/koda-task_2.png" alt="koda-task_2" width="300"/>
-<img src="/screens/koda-task_3.png" alt="koda-task_3" width="300"/>
+<img src="/screens/koda-task_1.png" alt="koda-task_1" width="220"/>
+<img src="/screens/koda-task_2.png" alt="koda-task_2" width="220"/>
+<img src="/screens/koda-task_3.png" alt="koda-task_3" width="220"/>
 </p>
 
+---
 
 ## Opis Projektu
 
@@ -16,12 +21,15 @@ Projekt został podzielony na dwa główne moduły: serwer i klient, które znaj
 
 ### Technologie
 
-- **Serwer:** Node.js, Express, TypeScript, Cheerio, Langchain, Huggingface, Pinecone, CORS, Helmet.
-- **Klient:** Vite, Vue.js, UnoCSS
+- **Serwer:** Node.js, Express, TypeScript, Cheerio, LangChain, Huggingface, Pinecone, CORS, Helmet
+- **Klient:** Vite, Vue.js, Typescript, UnoCSS
+- **Inne:** ESLint, Prettier, Husky + Lint staged, Dotenv
 
 ### Skalowalność
 
 Projekt został zaprojektowany w sposób łatwy do skalowania. Nowe modele LLM można dodać poprzez rozszerzenie klasy `LLMBaseClass`, która definiuje podstawową strukturę systemu. Dodanie nowych klas obsługujących inne modele LLM pozwala na rozbudowę funkcjonalności projektu o nowe algorytmy i rozwiązania.
+
+---
 
 ## Wymagania
 
@@ -29,6 +37,8 @@ Przed rozpoczęciem, upewnij się, że masz zainstalowane:
 
 - Node.js (rekomendowane jest użycie [Bun](https://bun.sh/) dla lepszej wydajności)
 - Docker (lub Podman dla lepszej wydajności) do uruchomienia kontenerów
+
+---
 
 ## Instrukcje Instalacji i Uruchomienia
 

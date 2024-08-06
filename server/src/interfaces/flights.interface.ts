@@ -13,7 +13,7 @@ export interface IFlight {
 export interface IFlightInfo {
     destination: string;
     date: string;
-    returnDate: string;
+    returnDate?: string;
 }
 
 export interface IFlightSummary {

@@ -1,4 +1,4 @@
-import { FlightsBaseClass, IFlightsServiceBaseClass } from './Flights.base.class.ts';
+import { FlightsBaseClass, IFlightsServiceBaseClass } from './base/Flights.base.class.ts';
 import {
     ISerpApiFlightsRequestParams,
     ISerpApiFlightsResponse,
@@ -9,9 +9,13 @@ import {
 } from '../interfaces/serp-api-flights.interface.ts';
 import { getJson } from 'serpapi';
 import { IFlightSummary } from '../interfaces/flights.interface.ts';
+import { AirportDetails, fetchAirportDetailsByText } from '../utils/airport-codes.util.ts';
+import { isBefore, format } from 'date-fns';
 
 export interface IFlightsSerpApiService extends IFlightsServiceBaseClass {
     searchFlights<T = SerpApiFlightsResponse, P = SerpApiSearchFlightsParams>(params: P): Promise<T>;
+    recognizeAirportIataCodeByLocationString(recognizeLocation: string): Promise<string>;
+    validateRecognizedDates(date: Date): string;
 }
 
 /**
@@ -20,7 +24,7 @@ export interface IFlightsSerpApiService extends IFlightsServiceBaseClass {
  *
  * You need SERPAPI_API_KEY in .env
  */
-export class Flights_service_serpapiClass extends FlightsBaseClass implements IFlightsSerpApiService {
+export class Flights_SerpAPIClass extends FlightsBaseClass implements IFlightsSerpApiService {
     constructor() {
         super();
     }
@@ -35,17 +39,19 @@ export class Flights_service_serpapiClass extends FlightsBaseClass implements IF
     async searchFlights<T = Promise<SerpApiFlightsResponse>, P = SerpApiSearchFlightsParams>(params: P): Promise<T> {
         try {
             const { from, to, date, returnDate }: SerpApiSearchFlightsParams = params as SerpApiSearchFlightsParams;
-
-            // @todo: change to main engine and check env exists in constructor and add serapi engine in interface config
-            const result = await this.getFlightsDetails<ISerpApiFlightsResponse>({
+            const requestJsonParameters: ISerpApiFlightsRequestParams = {
                 engine: 'google_flights',
                 departure_id: from,
                 arrival_id: to,
                 date: date,
                 outbound_date: date,
-                return_date: returnDate,
+                type: 2, // 1 - trip (return_date is_required) | 2 - one way // @todo add recognize type
                 api_key: process.env.SERPAPI_API_KEY!,
-            });
+            };
+            if (returnDate) requestJsonParameters.return_date = returnDate;
+
+            // @todo: change to main engine and check env exists in constructor
+            const result = await this.getFlightsDetails<ISerpApiFlightsResponse>(requestJsonParameters);
 
             if (typeof result.best_flights === 'undefined') result.best_flights = [];
 
@@ -57,6 +63,21 @@ export class Flights_service_serpapiClass extends FlightsBaseClass implements IF
             console.error('Błąd podczas wyszukiwania lotów:', e);
             throw e;
         }
+    }
+
+    async recognizeAirportIataCodeByLocationString(recognizeLocation: string): Promise<string> {
+        const recognizeAirport = await fetchAirportDetailsByText<AirportDetails>(recognizeLocation, true);
+        if (!recognizeAirport) {
+            throw new Error('NO_AIRPORT_LOCATION');
+        }
+        return recognizeAirport.iata_code;
+    }
+
+    validateRecognizedDates(date: Date): string {
+        if (isBefore(date, new Date())) {
+            throw new Error('WRONG_DATE');
+        }
+        return format(date, 'yyyy-MM-dd');
     }
 
     /**
