@@ -9,6 +9,7 @@
 <img src="/screens/koda-task_1.png" alt="koda-task_1" width="220"/>
 <img src="/screens/koda-task_2.png" alt="koda-task_2" width="220"/>
 <img src="/screens/koda-task_3.png" alt="koda-task_3" width="220"/>
+<img src="/screens/koda-task_4.png" alt="koda-task_4" width="220"/>
 </p>
 
 ---
